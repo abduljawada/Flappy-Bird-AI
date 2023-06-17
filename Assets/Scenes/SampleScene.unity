@@ -490,11 +490,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flappyBirdAgent: {fileID: 1961234485}
-  pipePrefab: {fileID: 7334600577154105817, guid: 37ee5e672ee79514c88870cfe3377507, type: 3}
-  maxOffset: 4
-  timeBtwSpawns: 4
   scoreText: {fileID: 398098705}
-  pipeChangeDelay: 1
+  speed: 1.5
+  speedIncrease: 90
+  initialRoundTime: 10
+  pipePrefab: {fileID: 7334600577154105817, guid: 37ee5e672ee79514c88870cfe3377507, type: 3}
+  spawnDistance: 6
+  maxOffset: 4
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,6 +977,7 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   jumpForce: 5
+  fallGravity: 2.5
 --- !u!114 &1961234486
 MonoBehaviour:
   m_ObjectHideFlags: 0

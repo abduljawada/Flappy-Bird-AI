@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,38 +6,39 @@ public class PlayerController : MonoBehaviour
 {
     public float jumpForce = 10f;
     public float rotationModifier = 5f;
-    Rigidbody2D rigidBody2D;
+    private Rigidbody2D _rigidBody2D;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 300;
-        rigidBody2D = GetComponent<Rigidbody2D>();
+        _rigidBody2D = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (Input.GetKeyDown("space"))
         {
-            rigidBody2D.velocity = new Vector2(0, jumpForce);
+            _rigidBody2D.velocity = new Vector2(0, jumpForce);
             transform.eulerAngles = new Vector3(0, 0, 30);
         }
-        transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z - (rotationModifier * Time.deltaTime));
-        if (transform.eulerAngles.z < 270 && transform.eulerAngles.z > 30)
+
+        var transform1 = transform;
+        transform1.eulerAngles = new Vector3(0, 0, transform1.eulerAngles.z - (rotationModifier * Time.deltaTime));
+        if (transform.eulerAngles.z is < 270 and > 30)
         {
             transform.eulerAngles = new Vector3(0, 0, -90);
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D()
     {
-        StartCoroutine("Die");
+        StartCoroutine(nameof(Die));
     }
-    IEnumerator Die()
+
+    private IEnumerator Die()
     {
-        AudioSource audioSource = GetComponent<AudioSource>();
+        var audioSource = GetComponent<AudioSource>();
 
         audioSource.Play();
 

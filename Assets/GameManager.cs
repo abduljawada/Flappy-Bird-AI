@@ -1,50 +1,65 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public FlappyBirdAgent flappyBirdAgent;
-    public GameObject pipePrefab;
-    public float maxOffset = 4f;
-    public float timeBtwSpawns = 2f;
-    private float _timeTillSpawn;
-    private int _score;
     public static GameManager Singleton;
+    public FlappyBirdAgent flappyBirdAgent;
+    
     public TMPro.TMP_Text scoreText;
-    private Queue<GameObject> _pipeQueue = new();
+    private int _score;
+    
+    [Header("Speed Management")]
+    [SerializeField] public float speed = 1f;
+    [SerializeField] private float speedIncrease = 90f;
+    [SerializeField] private float initialRoundTime = 10f;
+    private float _initialSpeed;
+    private float _roundDistance;
+    private float _currentRoundDistance;
+    
+    [Header("Spawning")]
+    public GameObject pipePrefab;
+    [SerializeField] private float spawnDistance = 10f;
+    public float maxOffset = 4f;
+    private float _distanceSinceSpawn;
+    private readonly Queue<GameObject> _pipeQueue = new();
     private GameObject _nextPipe;
     private GameObject _previousPipe;
-    [SerializeField] private float pipeChangeDelay = 0.1f;
-        
-    public GameManager()
-    {
-        _timeTillSpawn = 0;
-        _score = 0;
-    }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        Screen.SetResolution(1080, 1920, true);
         Singleton = this;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        _timeTillSpawn -= Time.deltaTime;
-        if (_timeTillSpawn <= 0)
+        Screen.SetResolution(1080, 1920, true);
+        _roundDistance = speed * initialRoundTime;
+        _initialSpeed = speed;
+    }
+
+    private void Update()
+    {
+        var deltaDistance = speed * Time.deltaTime;
+        _currentRoundDistance += deltaDistance;
+        _distanceSinceSpawn += deltaDistance;
+        
+        if (_currentRoundDistance >= _roundDistance)
         {
-            _timeTillSpawn = timeBtwSpawns;
-            SpawnPipe();
+            _currentRoundDistance = 0f;
+            speed += _roundDistance / speedIncrease;
         }
+
+        if (!(_distanceSinceSpawn >= spawnDistance)) return;
+        _distanceSinceSpawn = 0;
+        SpawnPipe();
     }
 
     private void SpawnPipe()
     {
         var position = pipePrefab.transform.position;
-        GameObject pipe = Instantiate(pipePrefab,
+        var pipe = Instantiate(pipePrefab,
             new Vector3(position.x, position.y + Random.Range(-maxOffset, maxOffset), 0), Quaternion.identity);
         _pipeQueue.Enqueue(pipe);
     }
@@ -54,16 +69,9 @@ public class GameManager : MonoBehaviour
         _score++;
         scoreText.text = _score.ToString();
         flappyBirdAgent.GetPoint();
-        StartCoroutine(DelayDequeuePipe());
     }
 
-    IEnumerator DelayDequeuePipe()
-    {
-        yield return new WaitForSeconds(pipeChangeDelay);
-        DequeuePipe();
-    }
-
-    private void DequeuePipe()
+    public void DequeuePipe()
     {
         _previousPipe = _nextPipe;
         _nextPipe = _pipeQueue.Dequeue();
@@ -87,6 +95,10 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame()
     {
+        speed = _initialSpeed;
+        _currentRoundDistance = 0;
+        _distanceSinceSpawn = 0;
+        
         ResetScore();
         
         if (_nextPipe)
@@ -105,7 +117,6 @@ public class GameManager : MonoBehaviour
         }
         
         EmptyQueue();
-        _timeTillSpawn = timeBtwSpawns;
         SpawnPipe();
         _nextPipe = _pipeQueue.Dequeue();
         StopAllCoroutines();
