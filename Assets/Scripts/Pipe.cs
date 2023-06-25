@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Pipe : MonoBehaviour
 {
+    [SerializeField] private float speed = 1.5f;
+
     private bool _isScored;
     private bool _isDequeued;
 
@@ -17,7 +19,7 @@ public class Pipe : MonoBehaviour
     private void Update()
     {
         Transform transform1;
-        (transform1 = transform).Translate(GameManager.speed * Time.deltaTime * Vector2.left);
+        (transform1 = transform).Translate(speed * Time.deltaTime * Vector2.left);
         
         switch (transform1.position.x)
         {

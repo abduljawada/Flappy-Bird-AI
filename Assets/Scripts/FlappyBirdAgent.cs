@@ -6,10 +6,10 @@ using Unity.MLAgents.Sensors;
 
 public class FlappyBirdAgent : Agent
 {
+    [SerializeField] private float jumpForce;
+    
     private Rigidbody2D _rb2d;
     private bool _isDead;
-    [SerializeField] private float jumpForce;
-    [SerializeField] private float fallGravity = 3f;
     private bool _earnedPoint;
 
     public override void Initialize()
@@ -57,13 +57,8 @@ public class FlappyBirdAgent : Agent
             //Debug.Log("Jumping");
             _rb2d.velocity = Vector2.zero;
             _rb2d.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
-            _rb2d.gravityScale = 1f;
         }
-        else if (_rb2d.velocity.y < 0f)
-        {
-            _rb2d.gravityScale = fallGravity;
-        }
-
+        
         if (_isDead)
         {
             const float reward = -10.0f;

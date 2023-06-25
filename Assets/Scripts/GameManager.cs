@@ -11,11 +11,8 @@ public class GameManager : MonoBehaviour
     private int _score;
     
     [Header("Speed Management")]
-    [SerializeField] public float speed = 1f;
     [SerializeField] private float speedIncrease = 90f;
-    [SerializeField] private float initialRoundTime = 10f;
-    private float _initialSpeed;
-    private float _roundDistance;
+    [SerializeField] private float roundDistance = 15f;
     private float _currentRoundDistance;
     
     [Header("Spawning")]
@@ -32,23 +29,16 @@ public class GameManager : MonoBehaviour
         Singleton = this;
     }
 
-    private void Start()
-    {
-        Screen.SetResolution(1080, 1920, true);
-        _roundDistance = speed * initialRoundTime;
-        _initialSpeed = speed;
-    }
-
     private void Update()
     {
-        var deltaDistance = speed * Time.deltaTime;
+        var deltaDistance = 1.5f * Time.deltaTime;
         _currentRoundDistance += deltaDistance;
         _distanceSinceSpawn += deltaDistance;
         
-        if (_currentRoundDistance >= _roundDistance)
+        if (_currentRoundDistance >= roundDistance)
         {
             _currentRoundDistance = 0f;
-            speed += _roundDistance / speedIncrease;
+            Time.timeScale += roundDistance / speedIncrease;
         }
 
         if (!(_distanceSinceSpawn >= spawnDistance)) return;
@@ -95,7 +85,7 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame()
     {
-        speed = _initialSpeed;
+		Time.timeScale = 1f;
         _currentRoundDistance = 0;
         _distanceSinceSpawn = 0;
         
